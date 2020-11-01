@@ -2374,7 +2374,7 @@ var NewsApiService = /*#__PURE__*/function () {
       var _this = this;
 
       console.log(this);
-      var url = "".concat(BASE_URL, "everything?qInTitle=").concat(this.searchInput, "&language=en&pageSize=5&page=").concat(this.page);
+      var url = "".concat(BASE_URL, "everything?qInTitle=").concat(this.searchInput, "&language=en&pageSize=5&page=").concat(this.page, "&apiKey=").concat(options.headers.Authorization);
       return fetch(url, options).then(function (responce) {
         return responce.json();
       }).then(function (_ref) {
@@ -2549,7 +2549,7 @@ var parent = module.bundle.parent;
 if ((!parent || !parent.isParcelRequire) && typeof WebSocket !== 'undefined') {
   var hostname = "" || location.hostname;
   var protocol = location.protocol === 'https:' ? 'wss' : 'ws';
-  var ws = new WebSocket(protocol + '://' + hostname + ':' + "53263" + '/');
+  var ws = new WebSocket(protocol + '://' + hostname + ':' + "55110" + '/');
 
   ws.onmessage = function (event) {
     checkedAssets = {};
