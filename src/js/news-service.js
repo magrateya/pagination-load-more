@@ -15,7 +15,7 @@ export default class NewsApiService {
         console.log(this);
         
 
-    const url = `${BASE_URL}everything?qInTitle=${this.searchInput}&language=en&pageSize=5&page=${this.page}`;
+    const url = `${BASE_URL}everything?qInTitle=${this.searchInput}&language=en&pageSize=5&page=${this.page}&apiKey=${options.headers.Authorization}`;
 
         return fetch(url, options).then(responce => responce.json()).then(({articles}) => {
             this.page += 1;
