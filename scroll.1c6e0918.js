@@ -2204,7 +2204,7 @@ THE SOFTWARE.
 });
 
 ;
-},{}],"templates/articles.hbs":[function(require,module,exports) {
+},{}],"templates/scroll-tpl.hbs":[function(require,module,exports) {
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -2233,7 +2233,7 @@ var templateFunction = _handlebars.default.template({
       return undefined;
     };
 
-    return "<li>\r\n    <a href=\"" + alias4((helper = (helper = lookupProperty(helpers, "url") || (depth0 != null ? lookupProperty(depth0, "url") : depth0)) != null ? helper : alias2, _typeof(helper) === alias3 ? helper.call(alias1, {
+    return "<article class=\"post\">\r\n    <a href=\"" + alias4((helper = (helper = lookupProperty(helpers, "url") || (depth0 != null ? lookupProperty(depth0, "url") : depth0)) != null ? helper : alias2, _typeof(helper) === alias3 ? helper.call(alias1, {
       "name": "url",
       "hash": {},
       "data": data,
@@ -2303,7 +2303,7 @@ var templateFunction = _handlebars.default.template({
           "column": 30
         }
       }
-    }) : helper)) + "</p>\r\n        </article>\r\n    </a>\r\n</li>\r\n";
+    }) : helper)) + "</p>\r\n        </article>\r\n    </a>\r\n</article>\r\n";
   },
   "compiler": [8, ">= 4.3.0"],
   "main": function main(container, depth0, helpers, partials, data) {
@@ -2400,95 +2400,23 @@ var NewsApiService = /*#__PURE__*/function () {
 }();
 
 exports.default = NewsApiService;
-},{}],"js/load-more.js":[function(require,module,exports) {
+},{}],"js/scroll.js":[function(require,module,exports) {
 "use strict";
 
-Object.defineProperty(exports, "__esModule", {
-  value: true
-});
-exports.default = void 0;
+require("../css/styles.css");
 
-function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+var _scrollTpl = _interopRequireDefault(require("../templates/scroll-tpl.hbs"));
 
-function _defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } }
-
-function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _defineProperties(Constructor.prototype, protoProps); if (staticProps) _defineProperties(Constructor, staticProps); return Constructor; }
-
-var LoadMoreBtn = /*#__PURE__*/function () {
-  function LoadMoreBtn(_ref) {
-    var selector = _ref.selector,
-        _ref$hidden = _ref.hidden,
-        hidden = _ref$hidden === void 0 ? false : _ref$hidden;
-
-    _classCallCheck(this, LoadMoreBtn);
-
-    this.refs = this.getRefs(selector);
-    hidden && this.hide();
-  }
-
-  _createClass(LoadMoreBtn, [{
-    key: "getRefs",
-    value: function getRefs(selector) {
-      var refs = {};
-      refs.button = document.querySelector(selector);
-      refs.label = refs.button.querySelector('.label');
-      refs.spinner = refs.button.querySelector('.spinner');
-      return refs;
-    }
-  }, {
-    key: "enable",
-    value: function enable() {
-      this.refs.button.disabled = false;
-      this.refs.label.textContent = 'Показать ещё';
-      this.refs.spinner.classList.add('is-hidden');
-    }
-  }, {
-    key: "disable",
-    value: function disable() {
-      this.refs.button.disabled = true;
-      this.refs.label.textContent = 'Загружаем...';
-      this.refs.spinner.classList.remove('is-hidden');
-    }
-  }, {
-    key: "show",
-    value: function show() {
-      this.refs.button.classList.remove('is-hidden');
-    }
-  }, {
-    key: "hide",
-    value: function hide() {
-      this.refs.button.classList.add('is-hidden');
-    }
-  }]);
-
-  return LoadMoreBtn;
-}();
-
-exports.default = LoadMoreBtn;
-},{}],"index.js":[function(require,module,exports) {
-"use strict";
-
-require("./css/styles.css");
-
-var _articles = _interopRequireDefault(require("./templates/articles.hbs"));
-
-var _newsService = _interopRequireDefault(require("./js/news-service"));
-
-var _loadMore = _interopRequireDefault(require("./js/load-more"));
+var _newsService = _interopRequireDefault(require("./news-service"));
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 var refs = {
   searchForm: document.querySelector('.js-search-form'),
-  articlesContainer: document.querySelector('.js-articles-container')
+  articlesContainer: document.querySelector('.container')
 };
-var loadMoreBtn = new _loadMore.default({
-  selector: '[data-action="load-more"]',
-  hidden: true
-});
 var newsApiService = new _newsService.default();
 refs.searchForm.addEventListener('submit', onSearch);
-loadMoreBtn.refs.button.addEventListener('click', fetchArticles);
 
 function onSearch(e) {
   e.preventDefault();
@@ -2496,16 +2424,16 @@ function onSearch(e) {
 
   if (newsApiService.query === '') {
     return;
-  }
+  } // loadMoreBtn.show();
 
-  loadMoreBtn.show();
+
   newsApiService.restPage();
   clearArticlesContainer();
   fetchArticles();
 }
 
 function fetchArticles() {
-  loadMoreBtn.disable();
+  // loadMoreBtn.disable();
   newsApiService.fetchArticles().then(function (articles) {
     appendArticlesMarkup(articles);
     loadMoreBtn.enable();
@@ -2513,13 +2441,21 @@ function fetchArticles() {
 }
 
 function appendArticlesMarkup(articles) {
-  refs.articlesContainer.insertAdjacentHTML('beforeend', (0, _articles.default)(articles));
+  refs.articlesContainer.insertAdjacentHTML('beforeend', (0, _scrollTpl.default)(articles));
 }
 
 function clearArticlesContainer() {
   refs.articlesContainer.innerHTML = '';
 }
-},{"./css/styles.css":"css/styles.css","./templates/articles.hbs":"templates/articles.hbs","./js/news-service":"js/news-service.js","./js/load-more":"js/load-more.js"}],"../node_modules/parcel-bundler/src/builtins/hmr-runtime.js":[function(require,module,exports) {
+
+var infScroll = new InfiniteScroll(refs.articlesContainer, {
+  // options
+  path: '.pagination__next',
+  append: '.post',
+  history: false
+});
+infScroll.loadNextPage();
+},{"../css/styles.css":"css/styles.css","../templates/scroll-tpl.hbs":"templates/scroll-tpl.hbs","./news-service":"js/news-service.js"}],"../node_modules/parcel-bundler/src/builtins/hmr-runtime.js":[function(require,module,exports) {
 var global = arguments[3];
 var OVERLAY_ID = '__parcel__error__overlay__';
 var OldModule = module.bundle.Module;
@@ -2723,5 +2659,5 @@ function hmrAcceptRun(bundle, id) {
     return true;
   }
 }
-},{}]},{},["../node_modules/parcel-bundler/src/builtins/hmr-runtime.js","index.js"], null)
-//# sourceMappingURL=/src.e31bb0bc.js.map
+},{}]},{},["../node_modules/parcel-bundler/src/builtins/hmr-runtime.js","js/scroll.js"], null)
+//# sourceMappingURL=/scroll.1c6e0918.js.map
