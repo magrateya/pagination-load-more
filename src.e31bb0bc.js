@@ -2366,8 +2366,16 @@ var NewsApiService = /*#__PURE__*/function () {
     value: function fetchArticles() {
       var _this = this;
 
+      var searchParams = new URLSearchParams({
+        q: this.searchInput,
+        language: 'en',
+        pageSize: 10,
+        page: this.page,
+        apiKey: '2f479ca51904464eaecc59acc7478e76'
+      });
       var BASE_URL = 'https://newsapi.org/v2/';
-      var url = "".concat(BASE_URL, "everything?qInTitle=").concat(this.searchInput, "&language=en&pageSize=10&page=").concat(this.page, "&apiKey=2f479ca51904464eaecc59acc7478e76");
+      var url = "".concat(BASE_URL, "everything?").concat(searchParams); // const url = `${BASE_URL}everything?qInTitle=${this.searchInput}&language=en&pageSize=10&page=${this.page}&apiKey=2f479ca51904464eaecc59acc7478e76`;
+
       return fetch(url).then(function (responce) {
         return responce.json();
       }).then(function (_ref) {
@@ -2452,7 +2460,6 @@ function clearArticlesContainer() {
 var onEntry = function onEntry(entries) {
   entries.forEach(function (entry) {
     if (entry.isIntersecting && newsApiService.query !== '') {
-      console.log('hi');
       fetchArticles();
     }
   });
@@ -2491,7 +2498,7 @@ var parent = module.bundle.parent;
 if ((!parent || !parent.isParcelRequire) && typeof WebSocket !== 'undefined') {
   var hostname = "" || location.hostname;
   var protocol = location.protocol === 'https:' ? 'wss' : 'ws';
-  var ws = new WebSocket(protocol + '://' + hostname + ':' + "65052" + '/');
+  var ws = new WebSocket(protocol + '://' + hostname + ':' + "52841" + '/');
 
   ws.onmessage = function (event) {
     checkedAssets = {};
