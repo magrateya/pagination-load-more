@@ -2367,13 +2367,8 @@ var NewsApiService = /*#__PURE__*/function () {
       var _this = this;
 
       var BASE_URL = 'https://newsapi.org/v2/';
-      var options = {
-        headers: {
-          Authorization: '2f479ca51904464eaecc59acc7478e76'
-        }
-      };
-      var url = "".concat(BASE_URL, "everything?qInTitle=").concat(this.searchInput, "&language=en&pageSize=5&page=").concat(this.page, "&apiKey=").concat(options.headers.Authorization);
-      return fetch(url, options).then(function (responce) {
+      var url = "".concat(BASE_URL, "everything?qInTitle=").concat(this.searchInput, "&language=en&pageSize=10&page=").concat(this.page, "&apiKey=2f479ca51904464eaecc59acc7478e76");
+      return fetch(url).then(function (responce) {
         return responce.json();
       }).then(function (_ref) {
         var articles = _ref.articles;
@@ -2400,71 +2395,6 @@ var NewsApiService = /*#__PURE__*/function () {
 }();
 
 exports.default = NewsApiService;
-},{}],"js/load-more.js":[function(require,module,exports) {
-"use strict";
-
-Object.defineProperty(exports, "__esModule", {
-  value: true
-});
-exports.default = void 0;
-
-function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
-
-function _defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } }
-
-function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _defineProperties(Constructor.prototype, protoProps); if (staticProps) _defineProperties(Constructor, staticProps); return Constructor; }
-
-var LoadMoreBtn = /*#__PURE__*/function () {
-  function LoadMoreBtn(_ref) {
-    var selector = _ref.selector,
-        _ref$hidden = _ref.hidden,
-        hidden = _ref$hidden === void 0 ? false : _ref$hidden;
-
-    _classCallCheck(this, LoadMoreBtn);
-
-    this.refs = this.getRefs(selector);
-    hidden && this.hide();
-  }
-
-  _createClass(LoadMoreBtn, [{
-    key: "getRefs",
-    value: function getRefs(selector) {
-      var refs = {};
-      refs.button = document.querySelector(selector);
-      refs.label = refs.button.querySelector('.label');
-      refs.spinner = refs.button.querySelector('.spinner');
-      return refs;
-    }
-  }, {
-    key: "enable",
-    value: function enable() {
-      this.refs.button.disabled = false;
-      this.refs.label.textContent = 'Показать ещё';
-      this.refs.spinner.classList.add('is-hidden');
-    }
-  }, {
-    key: "disable",
-    value: function disable() {
-      this.refs.button.disabled = true;
-      this.refs.label.textContent = 'Загружаем...';
-      this.refs.spinner.classList.remove('is-hidden');
-    }
-  }, {
-    key: "show",
-    value: function show() {
-      this.refs.button.classList.remove('is-hidden');
-    }
-  }, {
-    key: "hide",
-    value: function hide() {
-      this.refs.button.classList.add('is-hidden');
-    }
-  }]);
-
-  return LoadMoreBtn;
-}();
-
-exports.default = LoadMoreBtn;
 },{}],"index.js":[function(require,module,exports) {
 "use strict";
 
@@ -2474,21 +2404,21 @@ var _articles = _interopRequireDefault(require("./templates/articles.hbs"));
 
 var _newsService = _interopRequireDefault(require("./js/news-service"));
 
-var _loadMore = _interopRequireDefault(require("./js/load-more"));
-
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
+// import LoadMoreBtn from './js/load-more';
+// import './js/scroll';
 var refs = {
   searchForm: document.querySelector('.js-search-form'),
-  articlesContainer: document.querySelector('.js-articles-container')
-};
-var loadMoreBtn = new _loadMore.default({
-  selector: '[data-action="load-more"]',
-  hidden: true
-});
+  articlesContainer: document.querySelector('.js-articles-container'),
+  sentinel: document.querySelector('#sentinel')
+}; // const loadMoreBtn = new LoadMoreBtn({
+//   selector: '[data-action="load-more"]',
+//   hidden: true,
+// });
+
 var newsApiService = new _newsService.default();
-refs.searchForm.addEventListener('submit', onSearch);
-loadMoreBtn.refs.button.addEventListener('click', fetchArticles);
+refs.searchForm.addEventListener('submit', onSearch); // loadMoreBtn.refs.button.addEventListener('click', fetchArticles);
 
 function onSearch(e) {
   e.preventDefault();
@@ -2496,19 +2426,18 @@ function onSearch(e) {
 
   if (newsApiService.query === '') {
     return;
-  }
+  } //   loadMoreBtn.show();
 
-  loadMoreBtn.show();
+
   newsApiService.restPage();
   clearArticlesContainer();
   fetchArticles();
 }
 
 function fetchArticles() {
-  loadMoreBtn.disable();
+  //   loadMoreBtn.disable();
   newsApiService.fetchArticles().then(function (articles) {
-    appendArticlesMarkup(articles);
-    loadMoreBtn.enable();
+    appendArticlesMarkup(articles); // loadMoreBtn.enable();
   });
 }
 
@@ -2519,7 +2448,22 @@ function appendArticlesMarkup(articles) {
 function clearArticlesContainer() {
   refs.articlesContainer.innerHTML = '';
 }
-},{"./css/styles.css":"css/styles.css","./templates/articles.hbs":"templates/articles.hbs","./js/news-service":"js/news-service.js","./js/load-more":"js/load-more.js"}],"../node_modules/parcel-bundler/src/builtins/hmr-runtime.js":[function(require,module,exports) {
+
+var onEntry = function onEntry(entries) {
+  entries.forEach(function (entry) {
+    if (entry.isIntersecting && newsApiService.query !== '') {
+      console.log('hi');
+      fetchArticles();
+    }
+  });
+};
+
+var options = {
+  rootMargin: '200px'
+};
+var observer = new IntersectionObserver(onEntry, options);
+observer.observe(refs.sentinel);
+},{"./css/styles.css":"css/styles.css","./templates/articles.hbs":"templates/articles.hbs","./js/news-service":"js/news-service.js"}],"../node_modules/parcel-bundler/src/builtins/hmr-runtime.js":[function(require,module,exports) {
 var global = arguments[3];
 var OVERLAY_ID = '__parcel__error__overlay__';
 var OldModule = module.bundle.Module;
@@ -2547,7 +2491,7 @@ var parent = module.bundle.parent;
 if ((!parent || !parent.isParcelRequire) && typeof WebSocket !== 'undefined') {
   var hostname = "" || location.hostname;
   var protocol = location.protocol === 'https:' ? 'wss' : 'ws';
-  var ws = new WebSocket(protocol + '://' + hostname + ':' + "65198" + '/');
+  var ws = new WebSocket(protocol + '://' + hostname + ':' + "65052" + '/');
 
   ws.onmessage = function (event) {
     checkedAssets = {};
